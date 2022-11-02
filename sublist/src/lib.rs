@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Comparison {
     Equal,
@@ -6,26 +8,42 @@ pub enum Comparison {
     Unequal,
 }
 
-pub fn sublist<T: PartialEq>(_first_list: &[T], _second_list: &[T]) -> Comparison {
-    let first_len = _first_list.len();
-    let second_len = _second_list.len();
-    if first_len == second_len {
-        if first_len == 0 {
-            return Comparison::Equal;
+pub fn sublist<T: PartialEq + std::fmt::Display>(
+    _first_list: &[T],
+    _second_list: &[T],
+) -> Comparison {
+    let mut map = HashMap::new();
+    if _first_list.len() > _second_list.len() {
+        for each in _first_list {
+            let key = format!("{}", each);
+            map.entry(key).and_modify(|e| *e += 1).or_insert(1);
         }
-        if second_len == 0 {
-            return Comparison::Equal;
+        for each in _second_list {
+            let key = format!("{}", each);
+            map.entry(key).and_modify(|e| *e -= 1).or_insert(-1);
+        }
+    } else {
+        for each in _second_list {
+            let key = format!("{}", each);
+            map.entry(key).and_modify(|e| *e += 1).or_insert(1);
+        }
+        for each in _first_list {
+            let key = format!("{}", each);
+            map.entry(key).and_modify(|e| *e -= 1).or_insert(-1);
         }
     }
-    if first_len > second_len {
-        if second_len == 0 {
-            return Comparison::Superlist;
-        }
+
+    if map.values().into_iter().all(|&value| value == 0) {
+        return Comparison::Equal;
     }
-    if first_len < second_len {
-        if first_len == 0 {
-            return Comparison::Sublist;
-        }
+
+    if map.values().into_iter().all(|&value| value >= 0) {
+        return Comparison::Superlist;
     }
+
+    if map.values().into_iter().all(|&value| value <= 0) {
+        return Comparison::Sublist;
+    }
+
     Comparison::Unequal
 }
