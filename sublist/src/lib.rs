@@ -13,24 +13,13 @@ pub fn sublist<T: PartialEq + std::fmt::Display>(
     _second_list: &[T],
 ) -> Comparison {
     let mut map = HashMap::new();
-    if _first_list.len() > _second_list.len() {
-        for each in _first_list {
-            let key = format!("{}", each);
-            map.entry(key).and_modify(|e| *e += 1).or_insert(1);
-        }
-        for each in _second_list {
-            let key = format!("{}", each);
-            map.entry(key).and_modify(|e| *e -= 1).or_insert(-1);
-        }
-    } else {
-        for each in _second_list {
-            let key = format!("{}", each);
-            map.entry(key).and_modify(|e| *e += 1).or_insert(1);
-        }
-        for each in _first_list {
-            let key = format!("{}", each);
-            map.entry(key).and_modify(|e| *e -= 1).or_insert(-1);
-        }
+    for each in _first_list {
+        let key = format!("{}", each);
+        map.entry(key).and_modify(|e| *e += 1).or_insert(1);
+    }
+    for each in _second_list {
+        let key = format!("{}", each);
+        map.entry(key).and_modify(|e| *e -= 1).or_insert(-1);
     }
 
     if map.values().into_iter().all(|&value| value == 0) {
